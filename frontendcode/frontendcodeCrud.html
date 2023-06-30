@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-image: url('pg.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        #submit {
+            margin-top: 20px;
+        }
+    </style>
+    <!--bootstrap cdn -->
+    <!--bootstrap is free framework used for front end web development,make styling of the web page-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container"><!-- left and right padding to any HTML(Padding refers to the space between the content of an element and its border.)-->
+        <h1 class="text-center"><b>Restaurant App</b></h1>
+        <div class="row"> <!--The <div> tag defines a division or a section in an HTML document.-->
+            <div class="col-lg-3"></div> <!--in order to complete bootstrap bit 16-->
+            <div class="col-lg-6">
+                <div id="ul"> <!--ul:unordered list of items-->
+                    <form onsubmit="saveToLocalStorage(event)" class="form-group">  <!--when i hit submit button onsubmit will get triggered and it will hold on cont price,then const product like that--><!--Wrap labels and form controls in <div class="form-group"> (needed for optimum spacing)-->
+                        <div class="row">
+                            <div class="col-lg-12"> <!--width of the column-->
+                                <label>Choose Price:</label>
+                                <input type="text" id="Prices" name="Prices" class="form-control" required> <!--Add class .form-control to all textual <input>, <textarea>, and <select> elements-->
+                            </div>
+                        </div>
+                        <div class="row"><!--form-group,form-control used for styling the forms its css property-->
+                            <div class="col-lg-12">
+                                <label>Choose Dish:</label>
+                                <input type="text" id="Dishesh" name="Dishesh" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label>Choose a Table:</label>
+                                <select name="Tables" id="Tables" class="form-control">
+                                    <option value="Table 1">Table 1</option>
+                                    <option value="Table 2">Table 2</option>
+                                    <option value="Table 3">Table 3</option>
+                                </select>
+                                <input type="submit" id="submit" name="submit" value="Add Product"
+                                    class="btn btn-primary btn-block btn-lg">
+                            </div>
+                        </div>
+                    </form>
+                    <h2><b>Orders</b></h2>
+                    <h1 id="table-1">Table 1 :</h1>
+                    <h1 id="table-2">Table 2 :</h1>
+                    <h1 id="table-3">Table 3 :</h1>
+                    <ul id="listofitems"></ul> <!--To create a basic list group, use an <ul>-->
+                </div>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+    </div>
+    <!-- how do i make network call from one computer to another means i have to use axios. 
+    Axios is the code written by someone and we are just downloading that code and with the help of library called axios we are using that code. 
+    Also axios helps to communicate between front end to the server,front end run on your computer and server runs on cloud -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.6/axios.min.js"></script>
+    <script>
+        async function saveToLocalStorage(event) {
+            event.preventDefault(); //in order to prevent reloading of page when i click on submit button
+            const price = event.target.Prices.value;
+            //This line retrieves the value entered in the input field with the name 'Prices' from the form.
+            //It uses event.target to access the form element and .value to retrieve the entered value.
+            const dish = event.target.Dishesh.value;
+            const table = event.target.Tables.value;
+
+            // Here, an object obj is created to store the captured data
+            //It contains properties price, dish, and table, which hold the respective values retrieved from the form.
+            const obj = {
+                price,
+                dish,
+                table
+            }
+
+            //post request helps to connect frontend to backend
+            //In order make website dynamic in nature we have to use backend. crudcrud website which provides backend api for free
+            //post requires object
+            //axios.post it is an asynchronous event it executes after some delay
+
+            try {
+                const response = await axios.post("https://crudcrud.com/api/c64e31157e5e4c9b82a27279fa0ef02e/RestaurantApp", obj);
+                showUserOnScreen(response.data);
+                event.target.reset(); //in order make form fields empty every time after clicking submit button
+                console.log(response);
+            } catch (error) {
+                console.log(error)
+            }
+        }
+            //in order to retieve the previous data on backend,screen(data wont lost eventhough we refresh the page)
+            //in order to show previously stored data on screen.    
+            //showing saved userdetails on console where inside data you can see saved data eventhough you have refreshed the page,data wont be lost
+            //get does not requires object
+            //axios.get it is an asynchronous event it executes after some delay
+            //GET is used to request data from a specified resource
+            //DOMContentLoaded it is used to check wheather webpage completely loaded or not
+            //once webpage completely loaded DOMContentLoaded will execute basic html document and its parsing has been taken place(parsing is a part of compiling process)
+            
+            window.addEventListener("DOMContentLoaded",async() =>{
+                try{
+                    const response = await axios.get('https://crudcrud.com/api/c64e31157e5e4c9b82a27279fa0ef02e/RestaurantApp');
+                    console.log('data length from get method:',response.data.length);
+                    console.log('response from get method',response);
+                    for(let i=0;i<response.data.length;i++){
+                        showUserOnScreen(response.data[i]);
+                    }
+                }catch(error){
+                    console.log('error from get method',error);
+                }
+            })
+
+
+        function showUserOnScreen(obj) {  //output showing on screen when submit button clicked
+            const parentEle = document.getElementById('listofitems');
+            //By using document.getElementById('listofitems'), you can access the DOM functionality 
+            //and retrieve a reference to the specific element with the ID "listofitems".
+            //Once you have the reference to this element, 
+            //you can perform various modifications or operations on it using JavaScript.
+            const childEle = document.createElement('li');
+            childEle.textContent = obj.price + ' - ' + obj.dish + ' - ' + obj.table + ' - ';
+            parentEle.appendChild(childEle);
+
+            //if i select obj.table as Table 1(while filling form fields)
+            //Table 1 we converted to lowercase and replace space with - i.e (table-1)
+            //table-1 is basically ID of Table 1 (The resulting ID, obtained from obj.table.toLowerCase().replace(' ', '-'))
+            //then ID is passed to document.getElementById() to search for an element in the HTML document with that ID.
+            //element basically table headings, in this example Table 1 heading ID
+            //If an element with a matching ID is found, it is assigned to the tableHeading variable.
+
+            //In summary:
+            //the line const tableHeading = document.getElementById(obj.table.toLowerCase().replace(' ', '-')); 
+            //searches for an HTML element with an ID matching obj.table. If found, 
+            //it allows us to position the childEle element relative to the table heading element in the HTML document.
+            
+            const tableHeading = document.getElementById(obj.table.toLowerCase().replace(' ', '-'));
+
+            //It effectively displays the item associated with obj.table under the corresponding table heading.
+            tableHeading.insertAdjacentElement('afterend', childEle);
+            
+            //creating a new HTML <input> element dynamically using JavaScript.
+            //In this specific case, it is creating an <input> element that represents a button.
+            const delButton = document.createElement('input');
+            delButton.type = "button";
+            delButton.value = "Delete";
+            childEle.appendChild(delButton);
+
+            delButton.onclick = async () => {
+                try {
+                    const response = await axios.delete("https://crudcrud.com/api/c64e31157e5e4c9b82a27279fa0ef02e/RestaurantApp/" + obj._id);
+                    childEle.remove();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            //how delete request works consider this example
+            /*const obj = {
+                _id: "abc123",
+                price: "$10",
+                dish: "Pizza",
+                table: "Table 1"
+            }; */
+            //when i click on delete button async function get triggered and 
+            //it make http delete request to the server(along with url we also pass the _id)
+            //suppose if i want to delete item1 in Table 1  heading
+            //on clicking delete button we make delete request to server
+            //for delete request item1 _id im getting from const obj = {}
+
+            //In the given code, the obj object does not have an explicitly defined _id property.
+            //However, it is important to note that when making a POST request to the server using axios.post,
+            // the server may generate a unique identifier (e.g., _id) for the created object and include it in the response.
+
+            //The async keyword is used to declare an asynchronous function.
+            //await keyword is used to wait for a promise to resolve
+            //try,catch used for handling errors
+            //try block:whenever we send request to server (crudcrud api) usig axios as a library,if we get request as sucessfull then will print the code in try block.
+            //catch block:whenever we send request to server (crudcrud api) usig axios as a library,if we get request as unsuccesful then will print the error in catch block.
+        }
+    </script>
+</body>
+
+</html>
+
+
